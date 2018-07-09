@@ -1,5 +1,6 @@
 const express = require('express')
 const mongoose = require("mongoose")
+const passport = require('passport')
 
 // routes
 const users = require('./routes/api/users')
@@ -7,6 +8,9 @@ const profile = require('./routes/api/profile')
 const posts = require('./routes/api/posts')
 
 const app = express()
+
+app.use(express.urlencoded({extended: false}))
+app.use(express.json())
 
 // DB config
 const db = require('./config/keys').mongoURI
@@ -19,9 +23,11 @@ mongoose
   })
   .catch(err => console.log(err))
 
-app.get('/', (req, res) => {
-  res.send('hello world')
-})
+// passport middlware
+app.use(passport.initialize())
+
+// passport config
+require('./config/passport')(passport)
 
 // use routes
 app.use('/api/users', users)
