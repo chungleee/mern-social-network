@@ -5,6 +5,8 @@ const passport = require('passport')
 
 // Load validation
 const validateProfileInput = require('../../validation/profile')
+const validateExperienceInput = require('../../validation/experience')
+const validateEducationInput = require('../../validation/education')
 
 // Load profile model
 const Profile = require('../../models/Profile')
@@ -142,7 +144,7 @@ router.post('/', passport.authenticate('jwt', { session: false }), (req, res) =>
 
   // skills - split into array
   if(typeof skills !== 'undefined') {
-    profileFields.skills = skills.split(',')
+    profileFields.skills = skills.split(',').trim()
   }
 
   // social
@@ -190,6 +192,84 @@ router.post('/', passport.authenticate('jwt', { session: false }), (req, res) =>
                   .then(profile => res.json(profile))
           })
       }
+    })
+})
+
+// @route   POST api/profile/experience
+// @desc    Create/edit experience to profile route
+// @access  Private
+router.post('/experience', passport.authenticate('jwt', {session:false}), (req, res) => {
+  const { errors, isValid } = validateExperienceInput(req.body)
+
+  if(!isValid) {
+    // return any errors
+    return res.status(400).json(errors)
+  }
+
+  Profile
+    .findOne({ user: req.user.id })
+    .then(profile => {
+      // destructuring
+      const { title, company, location, from, to, current, description } = req.body
+
+      // fields assignment
+      const newExp = {
+        title,
+        company,
+        location,
+        from,
+        to,
+        current,
+        description
+      }
+
+      // Add to exp array
+      profile.experience.unshift(newExp)
+
+      profile
+        .save()
+        .then(profile => {
+          res.json(profile)
+        })
+    })
+})
+
+// @route   POST api/profile/education
+// @desc    Create/edit education to profile route
+// @access  Private
+router.post('/education', passport.authenticate('jwt', {session:false}), (req, res) => {
+  const { errors, isValid } = validateEducationInput(req.body)
+
+  if(!isValid) {
+    // return any errors
+    return res.status(400).json(errors)
+  }
+
+  Profile
+    .findOne({ user: req.user.id })
+    .then(profile => {
+      // destructuring
+      const { school, degree, fieldofstudy, from, to, current, description } = req.body
+
+      // fields assignment
+      const newEdu = {
+        school,
+        degree,
+        fieldofstudy,
+        from,
+        to,
+        current,
+        description
+      }
+
+      // Add to exp array
+      profile.education.unshift(newEdu)
+
+      profile
+        .save()
+        .then(profile => {
+          res.json(profile)
+        })
     })
 })
 
