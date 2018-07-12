@@ -119,50 +119,84 @@ router.post('/', passport.authenticate('jwt', { session: false }), (req, res) =>
     return res.status(400).json(errors)
   }
 
-  const {
-    handle,
-    company, 
-    website,
-    location,
-    bio,
-    status,
-    githubusername,
-    skills
-  } = req.body
+  // const {
+  //   handle,
+  //   company, 
+  //   website,
+  //   location,
+  //   bio,
+  //   status,
+  //   githubusername,
+  //   skills
+  // } = req.body
 
   // get fields
-  const profileFields = {}
-  profileFields.user = req.user.id
+  // const profileFields = {}
+  // profileFields.user = req.user.id
+  
+  // if(handle) profileFields.handle = handle
+  // if(company) profileFields.company = company
+  // if(website) profileFields.website = website
+  // if(location) profileFields.location = location
+  // if(bio) profileFields.bio = bio
+  // if(status) profileFields.status = status
+  // if(githubusername) profileFields.githubusername = githubusername
 
-  if(handle) profileFields.handle = handle
-  if(company) profileFields.company = company
-  if(website) profileFields.website = website
-  if(location) profileFields.location = location
-  if(bio) profileFields.bio = bio
-  if(status) profileFields.status = status
-  if(githubusername) profileFields.githubusername = githubusername
 
-  // skills - split into array
-  if(typeof skills !== 'undefined') {
-    profileFields.skills = skills.split(',')
-  }
+  // // skills - split into array
+  // if(typeof skills !== 'undefined') {
+  //   profileFields.skills = skills.split(',')
+  // }
 
-  // social
-  const {
-    youtube,
-    facebook,
-    linkedin,
-    instagram,
-    twitter
-  } = req.body
+  // // social
+  // const {
+  //   youtube,
+  //   facebook,
+  //   linkedin,
+  //   instagram,
+  //   twitter
+  // } = req.body
 
-  profileFields.social = {}
+  // profileFields.social = {}
 
-  if(youtube) profileFields.social.youtube = youtube
-  if(facebook) profileFields.social.facebook = facebook
-  if(linkedin) profileFields.social.linkedin = linkedin
-  if(instagram) profileFields.social.instagram = instagram
-  if(twitter) profileFields.social.twitter = twitter
+  // if(youtube) profileFields.social.youtube = youtube
+  // if(facebook) profileFields.social.facebook = facebook
+  // if(linkedin) profileFields.social.linkedin = linkedin
+  // if(instagram) profileFields.social.instagram = instagram
+  // if(twitter) profileFields.social.twitter = twitter
+
+  // Get fields
+const profileFields = {};
+profileFields.user = req.user.id;
+profileFields.social = {};
+ 
+const whiteList = [
+  'handle', 
+  'company', 
+  'website', 
+  'bio', 
+  'status', 
+  'githubusername', 
+  'skills', 
+  'youtube', 
+  'twitter', 
+  'instagram', 
+  'facebook', 
+  'linkedin'
+];
+const inputData = Object.keys(req.body); 
+ 
+for (key of inputData) {
+    if (whiteList.includes(key)) {
+         if (key === 'skills' && typeof req.body.skills !== 'undefined') {
+             profileFields[key] = req.body.skills.split(',');
+         } else if (['youtube', 'twitter', 'instagram', 'facebook'].includes(key) && req.body[key]) {
+             profileFields.social[key] = req.body[key];
+         } else if (req.body[key]) {
+             profileFields[key] = req.body[key];
+         }
+     }
+ }
 
   Profile
     .findOne({ user: req.user.id })
