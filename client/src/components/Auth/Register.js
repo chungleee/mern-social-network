@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import axios from 'axios';
 
 class Register extends Component {
   constructor() {
@@ -26,10 +27,18 @@ class Register extends Component {
       password: this.state.password,
       password2: this.state.password2
     }
-    console.log(newUser);
+
+    axios.post('api/users/register', newUser)
+      .then(res => {
+        console.log(res.data);
+      })
+      .catch(err => this.setState({
+        errors: err.response.data
+      }))
   }
 
   render() {
+    const { errors } = this.state
     return (
       <div className="register">
         <div className="container">
@@ -43,20 +52,22 @@ class Register extends Component {
                     onChange={this.handleOnChange}
                     value={this.state.name} 
                     type="text" 
-                    className="form-control form-control-lg" 
+                    className={errors.name ? "form-control form-control-lg is-invalid" : "form-control form-control-lg"} 
                     placeholder="Name" 
                     name="name" 
                   />
+                  {errors.name && (<div className='invalid-feedback'>{errors.name}</div>)}
                 </div>
                 <div className="form-group">
                   <input
                     onChange={this.handleOnChange} 
                     value={this.state.email} 
                     type="email" 
-                    className="form-control form-control-lg" 
+                    className={errors.email ? "form-control form-control-lg is-invalid" : "form-control form-control-lg"} 
                     placeholder="Email Address" 
                     name="email" 
                   />
+                  {errors.email && (<div className='invalid-feedback'>{errors.email}</div>)}
                   <small className="form-text text-muted">This site uses Gravatar so if you want a profile image, use a Gravatar email</small>
                 </div>
                 <div className="form-group">
@@ -64,20 +75,22 @@ class Register extends Component {
                     onChange={this.handleOnChange} 
                     value={this.state.password} 
                     type="password" 
-                    className="form-control form-control-lg" 
+                    className={errors.password ? "form-control form-control-lg is-invalid" : "form-control form-control-lg"} 
                     placeholder="Password" 
                     name="password" 
                   />
+                  {errors.password && (<div className='invalid-feedback'>{errors.password}</div>)}
                 </div>
                 <div className="form-group">
                   <input
                     onChange={this.handleOnChange} 
                     value={this.state.password2} 
                     type="password" 
-                    className="form-control form-control-lg" 
+                    className={errors.password2 ? "form-control form-control-lg is-invalid" : "form-control form-control-lg"} 
                     placeholder="Confirm Password" 
                     name="password2" 
                   />
+                  {errors.password2 && (<div className='invalid-feedback'>{errors.password2}</div>)}
                 </div>
                 <input type="submit" className="btn btn-info btn-block mt-4" />
               </form>
