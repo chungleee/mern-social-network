@@ -86,13 +86,13 @@ router.post('/login', (req, res) => {
   User
     .findOne({ email }) 
     .then(user => {
-      const { id, name, avatar } = user
-
+      
       // check for user
       if(!user) {
         errors.email = 'User not found'
         return res.status(404).json(errors)
       }
+      const { id, name, avatar } = user
 
       // check password
       bcrypt
@@ -115,6 +115,7 @@ router.post('/login', (req, res) => {
           }
         })
     })
+    .catch(err => console.log(err))
 })
 
 // @route   GET api/users/current
